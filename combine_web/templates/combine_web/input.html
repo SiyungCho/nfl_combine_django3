@@ -13,9 +13,15 @@
                     {{ error }}
                 </div>
             {% endif %}
+            <hr>
             <form method="POST">
                 {% csrf_token %}
                 
+                <div class="form-group">
+                    <label for="name">Player name:</label>
+                    <input type="text" id="name" name="name" required><br>
+                </div>
+
                 <div class="form-group">
                 <label for="player_POS">Position (CB, QB, etc.):</label>
                 <input type="text" id="player_POS" name="player_POS" required><br>
@@ -23,45 +29,45 @@
 
                 <div class="form-group">
                     <label for="player_Height">Height (inches):</label>
-                    <input type="number" id="player_Height" name="player_Height" required><br>
+                    <input type="number" step="0.01" id="player_Height" name="player_Height" min="0" required><br>
                 </div>
                 
                 <div class="form-group">
                     <label for="player_Weight">Weight (lbs):</label>
-                    <input type="number" id="player_Weight" name="player_Weight" required><br>
+                    <input type="number" id="player_Weight" name="player_Weight" min="0" required><br>
                 </div>
 
                 <div class="form-group">
                     <label for="player_40Yard">40-Yard Dash Time (seconds):</label>
-                    <input type="number" step="0.01" id="player_40Yard" name="player_40Yard" required><br>
+                    <input type="number" step="0.01" id="player_40Yard" name="player_40Yard" min="0" required><br>
                 </div>
 
                 <div class="form-group">
                     <label for="player_BenchPress">Bench Press Reps:</label>
-                    <input type="number" id="player_BenchPress" name="player_BenchPress" required><br>
+                    <input type="number" id="player_BenchPress" name="player_BenchPress" min="0" required><br>
                 </div>
 
                 <div class="form-group">
                     <label for="player_Vert">Vertical Jump (inches):</label>
-                    <input type="number" step="0.1" id="player_Vert" name="player_Vert" required><br>
+                    <input type="number" step="0.1" id="player_Vert" name="player_Vert" min="0" required><br>
                 </div>
 
                 <div class="form-group">
                     <label for="player_Broad">Broad Jump (inches):</label>
-                    <input type="number" id="player_Broad" name="player_Broad" required><br>
+                    <input type="number" id="player_Broad" name="player_Broad" min="0" required><br>
                 </div>
 
                 <div class="form-group">
                     <label for="player_Shuttle">Shuttle Run Time (seconds):</label>
-                    <input type="number" step="0.01" id="player_Shuttle" name="player_Shuttle" required><br>
+                    <input type="number" step="0.01" id="player_Shuttle" name="player_Shuttle" min="0" required><br>
                 </div>
 
                 <div class="form-group">
                     <label for="player_3Cone">3-Cone Drill Time (seconds):</label>
-                    <input type="number" step="0.01" id="player_3Cone" name="player_3Cone" required><br>
+                    <input type="number" step="0.01" id="player_3Cone" name="player_3Cone" min="0" required><br>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Input data</button>
+                <button type="submit" class="btn btn-primary">Save</button>
             </form>
             <hr>
         </div>
