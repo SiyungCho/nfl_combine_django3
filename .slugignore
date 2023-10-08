@@ -1,3 +1,7 @@
 /test
 /spec
 /docs
+.vscode
+.venv
+*tests
+.log
