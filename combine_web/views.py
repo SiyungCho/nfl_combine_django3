@@ -92,54 +92,57 @@ def output(request, object_id):
     return render(request, 'combine_web/output.html', {'name':player.name,'score':player.prediction_score, 'object_id':object_id})
 
 def prospects(request, object_id):
+
+    if(object_id==0):
+        df = pd.read_csv('combine_web/combine2023_preds.csv')
+        combined_df = df.sort_values(by='Prediction Scores', ascending=False)
         
-    player = get_object_or_404(input_data, pk=object_id)
-    player_df = pd.DataFrame({'Name':[player.name], 'POS':[player.player_POS], 'Prediction Scores':[player.prediction_score]})
-    df = pd.read_csv('combine_web/combine2023_preds.csv')
-    combined_df = pd.concat([df, player_df], ignore_index=True)
-    player_POS = ['RB', 'WR', 'LB', 'CB', 'DE', 'OT', 'QB', 'S', 'DT', 'TE', 'OG', 'C']
+        result_df = combined_df.head(10)
+        result_worst_df = combined_df.tail(10)
 
-    colors = []
-    for score in combined_df['Prediction Scores']:
-        if round(score, 2) <= 0.24:
-            colors.append('salmon')
-        elif round(score,2) >= 0.25 and round(score,2) <= 0.49:
-            colors.append('peachpuff')
-        elif 0.50 <= round(score, 2) and round(score, 2) <= 0.74:
-            colors.append('skyblue')
-        elif 0.75 <= round(score, 2):
-            colors.append('seagreen')
-        else:
-            colors.append('gray')
-    combined_df['Color'] = colors
+        return render(request, 'combine_web/prospects.html', {'top_player':result_df, 'top_POS_player': result_worst_df})
+    else:
+        player = get_object_or_404(input_data, pk=object_id)
+        player_df = pd.DataFrame({'Name':[player.name], 'POS':[player.player_POS], 'Prediction Scores':[player.prediction_score]})
+        df = pd.read_csv('combine_web/combine2023_preds.csv')
+        combined_df = pd.concat([df, player_df], ignore_index=True)
+        combined_df = combined_df.sort_values(by='Prediction Scores', ascending=False)
+        combined_df['Color'] = 'peachpuff'
+        combined_df.loc[combined_df['Name'] == player.name, 'Color'] = 'salmon'
 
-    for position in player_POS:
-        position_data = combined_df[combined_df['POS'] == position]
-    
+        position_data = combined_df[combined_df['POS'] == player.player_POS]
+        
         plt.figure(figsize=(10, 6))
         plt.bar(position_data['Name'], position_data['Prediction Scores'], color=position_data['Color'])
         plt.xlabel('Player Name')
         plt.ylabel('Prediction Score')
-        plt.title(f'Prediction Scores for {position} Players')
+        plt.title(f'Prediction Scores for {player.player_POS} Players')
         plt.xticks(rotation=45, ha='right')
-        red_leg = plt.Line2D([0], [0], color='salmon', label='0-0.24 - Very Unlikely')
-        yellow_leg = plt.Line2D([0], [0], color='peachpuff', label='0.25-0.49 - Unlikely')
-        blue_leg = plt.Line2D([0], [0], color='skyblue', label='0.50-0.74 - Likely')
-        green_leg = plt.Line2D([0], [0], color='seagreen', label='0.74-1 - Very Likely')
-        plt.legend(handles=[red_leg, yellow_leg, blue_leg, green_leg], loc='upper right')
-        
+            
         plt.tight_layout()
-        # Define a path to save the graph
-        graph_path = os.path.join(settings.MEDIA_ROOT, 'combine_web', 'sample_graph.png') #--------------------------defo error here probs with pathing of graph
 
-        # Save the graph to the specified path
-        plt.savefig(graph_path)
+        media_dir = settings.MEDIA_ROOT
+        graph_filename = 'my_graph.png'
+        graph_path = os.path.join(media_dir, graph_filename)
 
-        # Close the Matplotlib plot to free up resources
+        plt.savefig(graph_path, format='png')
         plt.close()
 
-        # Pass the path to the template context
-        context = {'graph_path': graph_path}
-        
+        if player.name not in combined_df['Name'][:10].values:
+            player_data = {'Name': player.name, 'POS': player.player_POS, 'Prediction Scores': player.prediction_score}
+            top_10_players = combined_df.head(10)
+            result_df = pd.concat([top_10_players, pd.DataFrame([player_data])], ignore_index=True)
+        else:
+            result_df = combined_df.head(10)
 
-    return render(request, 'combine_web/prospects.html', context)
+        top_player_POS = combined_df[combined_df['POS'] == player.player_POS].head(10)
+
+        if player.name not in top_player_POS['Name'].values:
+            player_data = {'Name': player.name, 'POS': player.player_POS, 'Prediction Scores': player.prediction_score}
+            result_POS_df = pd.concat([top_player_POS, pd.DataFrame([player_data])], ignore_index=True)
+        else:
+            result_POS_df = top_player_POS
+
+        result_df = result_df.drop(columns=["Color"])
+        result_POS_df = result_POS_df.drop(columns=["Color"])
+        return render(request, 'combine_web/prospects.html', {'graph_url': os.path.join(settings.MEDIA_URL, graph_filename), 'top_player':result_df, 'top_POS_player': result_POS_df})

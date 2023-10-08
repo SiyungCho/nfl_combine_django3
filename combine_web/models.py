@@ -13,6 +13,7 @@ class input_data(models.Model):
     player_Shuttle = models.DecimalField(max_digits=4, decimal_places=2)  # Shuttle run time in seconds
     player_3Cone = models.DecimalField(max_digits=4, decimal_places=2)  # 3-cone drill time in seconds
     prediction_score = models.FloatField(default=0.0)
+    #file = models.FileField(upload_to='documents', max_length=200)
 
     def __str__(self):
         return self.name
