@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 class input_data(models.Model):
@@ -12,8 +13,7 @@ class input_data(models.Model):
     player_Broad = models.PositiveIntegerField()  # Broad jump in inches
     player_Shuttle = models.DecimalField(max_digits=4, decimal_places=2)  # Shuttle run time in seconds
     player_3Cone = models.DecimalField(max_digits=4, decimal_places=2)  # 3-cone drill time in seconds
-    prediction_score = models.FloatField(default=0.0)
-    #file = models.FileField(upload_to='documents', max_length=200)
+    prediction_score = models.FloatField(default=0.0, validators=[MinValueValidator(0.00), MaxValueValidator(1.00)])
 
     def __str__(self):
         return self.name

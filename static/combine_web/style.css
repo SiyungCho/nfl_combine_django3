@@ -3,7 +3,6 @@
     text-align: center;
     color: #fff;
     border-radius: 10px;
-    border: 1px solid red;
 }
 
 .input-bodies h4{
@@ -11,5 +10,5 @@
 }
 
 .main-input{
-    width: min-content;
+    width: auto;
 }

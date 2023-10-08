@@ -2,16 +2,32 @@
 
 {% block content %}
 <br>
-<br>
-<br>
-<br>
-<br>
-<br>
 <div class="row justify-content-center mt-5">
     <div class="col-md-7 text-center">
 
-        <h1>{{ name }}'s score was : {{ score }}</h1>
-        <p>...
+        <br>
+        {% if score > 0.5 %}
+        <div>
+            <h1 class="bg-success rounded" style="padding: 2%;">
+                {{ name }} <b>is</b> projected to be a Pro Bowl Player
+            </h1>
+            <h3 style="color: rgb(91, 90, 90)">{{ name }}'s score was : {{ score }}</h3>
+        </div>
+        {% else %}
+        <div>
+            <h1 class="bg-danger rounded" style="padding: 2%;">
+                {{ name }} <b>is not</b> projected to be a Pro Bowl Player
+            </h1>
+            <h3>{{ name }}'s score was : {{ score }}</h3>
+        </div>
+        {% endif %}
+        <br>
+
+        <p>
+            See how they measure up against the 2023 combine prospects
+        </p>
+        <p>
+            Click the button below!
         </p>
     <a role="button" class="btn btn-primary btn-lg" href="{% url 'prospects' object_id %}">Prospects</a>
     </div>

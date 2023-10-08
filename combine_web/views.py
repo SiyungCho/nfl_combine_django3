@@ -3,12 +3,10 @@ from .forms import input_data_Form
 from .models import input_data
 from django.contrib.auth.forms import UserCreationForm
 import tensorflow as tf
-from tensorflow import keras
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import numpy as np
-from django.urls import reverse
 import os
 from nfl_combine_web import settings
 
@@ -80,7 +78,7 @@ def input(request):
             
             prediction = model.predict(X_predict)
 
-            new_player.prediction_score = prediction
+            new_player.prediction_score = round(prediction.item(),3)
             new_player.save()
 
             return redirect( 'output', object_id=new_player.pk)
@@ -96,16 +94,22 @@ def prospects(request, object_id):
     if(object_id==0):
         df = pd.read_csv('combine_web/combine2023_preds.csv')
         combined_df = df.sort_values(by='Prediction Scores', ascending=False)
+        combined_df['Prediction Scores'] = combined_df['Prediction Scores'].round(3)
         
-        result_df = combined_df.head(10)
-        result_worst_df = combined_df.tail(10)
+        result_df = combined_df.head(5)
+        result_worst_df = combined_df.tail(5)
 
-        return render(request, 'combine_web/prospects.html', {'top_player':result_df, 'top_POS_player': result_worst_df})
+        result_df.rename(columns={'Prediction Scores': 'Prediction_Scores'}, inplace=True)
+        result_worst_df.rename(columns={'Prediction Scores': 'Prediction_Scores'}, inplace=True)
+
+        return render(request, 'combine_web/prospects.html', {'top_player':result_df, 'top_POS_player': result_worst_df, 'object_id':object_id})
     else:
         player = get_object_or_404(input_data, pk=object_id)
         player_df = pd.DataFrame({'Name':[player.name], 'POS':[player.player_POS], 'Prediction Scores':[player.prediction_score]})
         df = pd.read_csv('combine_web/combine2023_preds.csv')
         combined_df = pd.concat([df, player_df], ignore_index=True)
+        combined_df['Prediction Scores'] = combined_df['Prediction Scores'].round(3)
+        
         combined_df = combined_df.sort_values(by='Prediction Scores', ascending=False)
         combined_df['Color'] = 'peachpuff'
         combined_df.loc[combined_df['Name'] == player.name, 'Color'] = 'salmon'
@@ -128,21 +132,26 @@ def prospects(request, object_id):
         plt.savefig(graph_path, format='png')
         plt.close()
 
-        if player.name not in combined_df['Name'][:10].values:
+        if player.name not in combined_df['Name'][:5].values:
             player_data = {'Name': player.name, 'POS': player.player_POS, 'Prediction Scores': player.prediction_score}
-            top_10_players = combined_df.head(10)
+            top_10_players = combined_df.head(4)
             result_df = pd.concat([top_10_players, pd.DataFrame([player_data])], ignore_index=True)
         else:
-            result_df = combined_df.head(10)
+            result_df = combined_df.head(5)
 
-        top_player_POS = combined_df[combined_df['POS'] == player.player_POS].head(10)
+        #top_player_POS = combined_df[combined_df['POS'] == player.player_POS].head(5)
 
-        if player.name not in top_player_POS['Name'].values:
+        if player.name not in combined_df[combined_df['POS'] == player.player_POS][:5].values:
+            top_player_POS = combined_df[combined_df['POS'] == player.player_POS].head(4)
             player_data = {'Name': player.name, 'POS': player.player_POS, 'Prediction Scores': player.prediction_score}
             result_POS_df = pd.concat([top_player_POS, pd.DataFrame([player_data])], ignore_index=True)
         else:
+            top_player_POS = combined_df[combined_df['POS'] == player.player_POS].head(5)
             result_POS_df = top_player_POS
 
         result_df = result_df.drop(columns=["Color"])
         result_POS_df = result_POS_df.drop(columns=["Color"])
-        return render(request, 'combine_web/prospects.html', {'graph_url': os.path.join(settings.MEDIA_URL, graph_filename), 'top_player':result_df, 'top_POS_player': result_POS_df})
+
+        result_df.rename(columns={'Prediction Scores': 'Prediction_Scores'}, inplace=True)
+        result_POS_df.rename(columns={'Prediction Scores': 'Prediction_Scores'}, inplace=True)
+        return render(request, 'combine_web/prospects.html', {'graph_url': os.path.join(settings.MEDIA_URL, graph_filename), 'top_player':result_df, 'top_POS_player': result_POS_df, 'object_id':object_id})

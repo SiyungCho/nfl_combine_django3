@@ -1,26 +1,90 @@
 {% extends "combine_web/base.html" %}
-
+{% load static %}
 {% block content %}
+{% load static %}
 <br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<div class="row justify-content-center mt-5">
-    <div class="col-md-7 text-center">
-
-        <img src="{{ graph_url }}" alt="My Graph">
-        <div>
-            {{ top_player|safe }}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            {% if object_id == 0 %}
+                <img src="{% static 'combine_web/output.png' %}"  alt="Output Image" class="img-fluid" style="padding-top: 10vh;">
+            {% endif %}
+            {% if object_id != 0 %}
+                <img src="{{ graph_url }}" alt="My Graph" class="img-fluid" style="padding-top: 10vh;">
+            {% endif %}
         </div>
-        <p>...
-        </p>
-        <div>
-            {{ top_POS_player|safe }}
+        <div class="col-md-6">
+            <h3>Top Players:</h3>
+            <table class="table table-bordered table-sm" style="font-size: 12px; padding: 4px;">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Prediction Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for index, player in top_player.iterrows %}
+                        <tr>
+                            <td>{{ player.Name }}</td>
+                            <td>{{ player.POS }}</td>
+                            <td>{{ player.Prediction_Scores }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if object_id == 0 %}
+                <h3>Lowest Players:</h3>
+                <table class="table table-bordered table-sm" style="font-size: 12px; padding: 4px;">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Prediction Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for index, player in top_POS_player.iterrows %}
+                            <tr>
+                                <td>{{ player.Name }}</td>
+                                <td>{{ player.POS }}</td>
+                                <td>{{ player.Prediction_Scores }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+            {% if object_id != 0 %}
+                <h3>Top Players by Position:</h3>
+                <table class="table table-bordered table-sm" style="font-size: 12px; padding: 4px;">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Prediction Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for index, player in top_POS_player.iterrows %}
+                            <tr>
+                                <td>{{ player.Name }}</td>
+                                <td>{{ player.POS }}</td>
+                                <td>{{ player.Prediction_Scores }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
         </div>
-        <a role="button" class="btn btn-primary btn-lg" href="{% url 'input' %}">Input</a>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <a role="button" class="btn btn-primary btn-lg" href="{% url 'input' %}">Input</a>
+        </div>
     </div>
 </div>
+
+
+
 
 {% endblock %}
