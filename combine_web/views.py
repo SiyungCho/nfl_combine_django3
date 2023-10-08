@@ -10,6 +10,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import numpy as np
 from django.urls import reverse
 import os
+from nfl_combine_web import settings
 
 # Create your views here.
 def home(request):
@@ -22,7 +23,7 @@ def input(request):
         mean_metrics={'mean_height':73.75, 'mean_weight':240.12, 'mean_40_yard':4.81, 'mean_bench_press':19.80, 'mean_vert_leap': 32.25, 'mean_broad_jump':113.28, 'mean_shuttle': 4.42, 'mean_3cone':7.31}
         try:
             form = input_data_Form(request.POST)
-            new_player = form.save(commit=False)#don't put in database just yet
+            new_player = form.save(commit=False)
             new_player.save()
 
             if float(new_player.player_Height) == 0.0:
@@ -83,9 +84,6 @@ def input(request):
             new_player.save()
 
             return redirect( 'output', object_id=new_player.pk)
-            #return redirect('prospects', object_id=new_player.pk)
-
-            #return render(request, 'combine_web/output.html', {'name':new_player.name, 'score':new_player.prediction_score})
         except ValueError:
             return render(request, 'combine_web/input.html', {'form':input_data_Form(), 'error':'Error occured in data passed'})
         
@@ -94,12 +92,54 @@ def output(request, object_id):
     return render(request, 'combine_web/output.html', {'name':player.name,'score':player.prediction_score, 'object_id':object_id})
 
 def prospects(request, object_id):
-    try:
-        player = get_object_or_404(input_data, pk=object_id)
+        
+    player = get_object_or_404(input_data, pk=object_id)
+    player_df = pd.DataFrame({'Name':[player.name], 'POS':[player.player_POS], 'Prediction Scores':[player.prediction_score]})
+    df = pd.read_csv('combine_web/combine2023_preds.csv')
+    combined_df = pd.concat([df, player_df], ignore_index=True)
+    player_POS = ['RB', 'WR', 'LB', 'CB', 'DE', 'OT', 'QB', 'S', 'DT', 'TE', 'OG', 'C']
 
-        player_name = player.name
-        prediction_score = player.prediction_score
-        return render(request, 'combine_web/prospects.html', {'name': player_name, 'score': prediction_score})
+    colors = []
+    for score in combined_df['Prediction Scores']:
+        if round(score, 2) <= 0.24:
+            colors.append('salmon')
+        elif round(score,2) >= 0.25 and round(score,2) <= 0.49:
+            colors.append('peachpuff')
+        elif 0.50 <= round(score, 2) and round(score, 2) <= 0.74:
+            colors.append('skyblue')
+        elif 0.75 <= round(score, 2):
+            colors.append('seagreen')
+        else:
+            colors.append('gray')
+    combined_df['Color'] = colors
 
-    except ValueError:
-        return render(request, 'combine_web/home.html', {'error': 'Invalid data format'})
+    for position in player_POS:
+        position_data = combined_df[combined_df['POS'] == position]
+    
+        plt.figure(figsize=(10, 6))
+        plt.bar(position_data['Name'], position_data['Prediction Scores'], color=position_data['Color'])
+        plt.xlabel('Player Name')
+        plt.ylabel('Prediction Score')
+        plt.title(f'Prediction Scores for {position} Players')
+        plt.xticks(rotation=45, ha='right')
+        red_leg = plt.Line2D([0], [0], color='salmon', label='0-0.24 - Very Unlikely')
+        yellow_leg = plt.Line2D([0], [0], color='peachpuff', label='0.25-0.49 - Unlikely')
+        blue_leg = plt.Line2D([0], [0], color='skyblue', label='0.50-0.74 - Likely')
+        green_leg = plt.Line2D([0], [0], color='seagreen', label='0.74-1 - Very Likely')
+        plt.legend(handles=[red_leg, yellow_leg, blue_leg, green_leg], loc='upper right')
+        
+        plt.tight_layout()
+        # Define a path to save the graph
+        graph_path = os.path.join(settings.MEDIA_ROOT, 'combine_web', 'sample_graph.png') #--------------------------defo error here probs with pathing of graph
+
+        # Save the graph to the specified path
+        plt.savefig(graph_path)
+
+        # Close the Matplotlib plot to free up resources
+        plt.close()
+
+        # Pass the path to the template context
+        context = {'graph_path': graph_path}
+        
+
+    return render(request, 'combine_web/prospects.html', context)
