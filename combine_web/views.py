@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import input_data_Form
 from .models import input_data
 from django.contrib.auth.forms import UserCreationForm
@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import numpy as np
+from django.urls import reverse
 import os
 
 # Create your views here.
@@ -79,21 +80,26 @@ def input(request):
             prediction = model.predict(X_predict)
 
             new_player.prediction_score = prediction
-            #prediction_string = str(prediction[0][0])
+            new_player.save()
 
-            #return redirect('output', data=prediction_string)
-            return render(request, 'combine_web/output.html', {'name':new_player.prediction_score})
+            return redirect( 'output', object_id=new_player.pk)
+            #return redirect('prospects', object_id=new_player.pk)
+
+            #return render(request, 'combine_web/output.html', {'name':new_player.name, 'score':new_player.prediction_score})
         except ValueError:
             return render(request, 'combine_web/input.html', {'form':input_data_Form(), 'error':'Error occured in data passed'})
         
-def output(request):
-    return render(request, 'combine_web/output.html')
+def output(request, object_id):
+    player = get_object_or_404(input_data, pk=object_id)
+    return render(request, 'combine_web/output.html', {'name':player.name,'score':player.prediction_score, 'object_id':object_id})
 
-def prospects(request):
+def prospects(request, object_id):
     try:
-        
-        return render(request, 'combine_web/home.html')
+        player = get_object_or_404(input_data, pk=object_id)
+
+        player_name = player.name
+        prediction_score = player.prediction_score
+        return render(request, 'combine_web/prospects.html', {'name': player_name, 'score': prediction_score})
 
     except ValueError:
         return render(request, 'combine_web/home.html', {'error': 'Invalid data format'})
-    #return render(request, 'combine_web/home.html')
