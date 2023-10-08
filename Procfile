@@ -1,0 +1,1 @@
+web: gunicorn nfl_combine_web.wsgi
