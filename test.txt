@@ -1,0 +1,91 @@
+<div class="row justify-content-center mt-5">
+        <div class="col-md-5">
+            <h2>Player data</h2>
+            <h4 style="color: gray; font-size: small;">Ex. JaMarr Chase, WR, 72.38, 201, 4.34, 20, 41.0, 132, 3.99, 6.96</h4>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-2">
+        <div class="col-md-5">
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endif %}
+            <hr>
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="name">Player name:</label>
+                    <input type="text" id="name" name="name" required><br>
+                </div>
+
+                <div class="form-group">
+                <label for="player_POS">Position:</label>
+                <select id="player_POS" name="player_POS" required>
+                    <option value="RB">RB (Runningback)</option>
+                    <option value="WR">WR (Wide Receiver)</option>
+                    <option value="LB">LB (Linebacker)</option>
+                    <option value="CB">CB (Cornerback)</option>
+                    <option value="DE">DE (Defensive End)</option>
+                    <option value="OT">OT (Offensive Tackle)</option>
+                    <option value="QB">QB (Quarterback)</option>
+                    <option value="S">S (Safety)</option>
+                    <option value="DT">DT (Defensive Tackle)</option>
+                    <option value="TE">TE (Tight End)</option>
+                    <option value="OG">OG (Offensive Guard)</option>
+                    <option value="C">C (Center)</option>
+                    <option value="K">K (Kicker)</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="player_Height">Height (inches):</label>
+                    <input type="number" step="0.01" id="player_Height" name="player_Height" min="0" required><br>
+                </div>
+                
+                <div class="form-group">
+                    <label for="player_Weight">Weight (lbs):</label>
+                    <input type="number" id="player_Weight" name="player_Weight" min="0" required><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="player_40Yard">40-Yard Dash Time (seconds):</label>
+                    <input type="number" step="0.01" id="player_40Yard" name="player_40Yard" min="0" required><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="player_BenchPress">Bench Press Reps:</label>
+                    <input type="number" id="player_BenchPress" name="player_BenchPress" min="0" required><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="player_Vert">Vertical Jump (inches):</label>
+                    <input type="number" step="0.1" id="player_Vert" name="player_Vert" min="0" required><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="player_Broad">Broad Jump (inches):</label>
+                    <input type="number" id="player_Broad" name="player_Broad" min="0" required><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="player_Shuttle">Shuttle Run Time (seconds):</label>
+                    <input type="number" step="0.01" id="player_Shuttle" name="player_Shuttle" min="0" required><br>
+                </div>
+
+                <div class="form-group">
+                    <label for="player_3Cone">3-Cone Drill Time (seconds):</label>
+                    <input type="number" step="0.01" id="player_3Cone" name="player_3Cone" min="0" required><br>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+            <hr>
+        </div>
+    </div>
+
+    <li class="nav-item {{ create }}">
+                    <a class="nav-link" href="{% url 'prospects' %}">Prospects</a>
+                </li>

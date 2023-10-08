@@ -1,5 +1,20 @@
 {% extends "combine_web/base.html" %}
 
 {% block content %}
-    {{ name }}
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<div class="row justify-content-center mt-5">
+    <div class="col-md-7 text-center">
+
+        <h1>Score was {{ name }}</h1>
+        <p>...
+        </p>
+    <a role="button" class="btn btn-primary btn-lg" href="{% url 'prospects' %}">Prospects</a>
+    </div>
+</div>
+
 {% endblock %}
