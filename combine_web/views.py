@@ -52,7 +52,7 @@ def input(request):
             file_path = "combine_web/combine_prediction_model.keras"
 
             try:
-                model = keras.saving.load_model(file_path)
+                model = keras.models.load_model(file_path)
             except Exception as e:
                 return render(request, 'combine_web/input.html', {'form':input_data_Form(), 'error':'Error occured in data passed'})
             
