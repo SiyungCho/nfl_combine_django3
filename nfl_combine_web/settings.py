@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-@gb#c$xg#deqji59zbsz9pd55#)d%qefx2o6df@f6t2$c=jmwl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['https://nfl-combine-predictor-26aa2a92fefb.herokuapp.com/']
+ALLOWED_HOSTS = ['https://nfl-combine-predictor-26aa2a92fefb.herokuapp.com']
 
 
 # Application definition
