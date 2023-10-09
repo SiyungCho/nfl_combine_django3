@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import input_data_Form
 from .models import input_data
 from django.contrib.auth.forms import UserCreationForm
-import tensorflow as tf
+import keras
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -52,7 +52,7 @@ def input(request):
             file_path = "combine_web/combine_prediction_model.keras"
 
             try:
-                model = tf.keras.models.load_model(file_path)
+                model = keras.models.load_model(file_path)
             except Exception as e:
                 return render(request, 'combine_web/input.html', {'form':input_data_Form(), 'error':'Error occured in data passed'})
             
@@ -109,7 +109,7 @@ def prospects(request, object_id):
         df = pd.read_csv('combine_web/combine2023_preds.csv')
         combined_df = pd.concat([df, player_df], ignore_index=True)
         combined_df['Prediction Scores'] = combined_df['Prediction Scores'].round(3)
-        
+
         combined_df = combined_df.sort_values(by='Prediction Scores', ascending=False)
         combined_df['Color'] = 'peachpuff'
         combined_df.loc[combined_df['Name'] == player.name, 'Color'] = 'salmon'
