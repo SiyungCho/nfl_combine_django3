@@ -1,10 +1,9 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.contrib.auth.models import User
 
 # Create your models here.
 class input_data(models.Model):
-    name = models.CharField(max_length = 100)
+    name = models.CharField(max_length = 200)
     player_POS = models.CharField(max_length=2)  # Assuming positions are represented as two-letter codes like 'CB'
     player_Height = models.DecimalField(max_digits=4, decimal_places=2)  # Height in inches
     player_Weight = models.PositiveIntegerField()  # Weight in pounds
