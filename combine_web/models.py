@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import User
 
 # Create your models here.
 class input_data(models.Model):
@@ -14,6 +15,7 @@ class input_data(models.Model):
     player_Shuttle = models.DecimalField(max_digits=4, decimal_places=2)  # Shuttle run time in seconds
     player_3Cone = models.DecimalField(max_digits=4, decimal_places=2)  # 3-cone drill time in seconds
     prediction_score = models.FloatField(default=0.0, validators=[MinValueValidator(0.00), MaxValueValidator(1.00)])
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
